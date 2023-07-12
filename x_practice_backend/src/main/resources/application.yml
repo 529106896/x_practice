@@ -13,3 +13,11 @@ spring:
 logging:
   level:
     com.example: debug
+
+# 配置逻辑删除
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0

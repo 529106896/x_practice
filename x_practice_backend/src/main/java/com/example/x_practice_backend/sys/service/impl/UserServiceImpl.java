@@ -8,6 +8,7 @@ import com.example.x_practice_backend.sys.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -30,16 +31,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public Map<String, Object> login(User user) {
-        // 根据用户名和密码进行查询
+        // 先根据用户名进行查询
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getUsername, user.getUsername());
-        wrapper.eq(User::getPassword, user.getPassword());
         User loginUser = this.baseMapper.selectOne(wrapper);
 
-        // 结果不为空，则生成token，并且将用户信息放入redis
-        if (loginUser != null) {
+        // 结果不为空，并且传入的密码和数据库中的密码是匹配的，则生成token，并且将用户信息放入redis
+        if (loginUser != null && passwordEncoder.matches(user.getPassword(), loginUser.getPassword())) {
             // 暂时使用UUID来生成token，终极方案应该是jwt
             String key = "user:" + UUID.randomUUID();
 
@@ -55,6 +58,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         return null;
     }
+
+    // 旧版登录逻辑（未使用密码加密）
+//    @Override
+//    public Map<String, Object> login(User user) {
+//        // 根据用户名和密码进行查询
+//        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+//        wrapper.eq(User::getUsername, user.getUsername());
+//        wrapper.eq(User::getPassword, user.getPassword());
+//        User loginUser = this.baseMapper.selectOne(wrapper);
+//
+//        // 结果不为空，则生成token，并且将用户信息放入redis
+//        if (loginUser != null) {
+//            // 暂时使用UUID来生成token，终极方案应该是jwt
+//            String key = "user:" + UUID.randomUUID();
+//
+//            // 存入redis
+//            loginUser.setPassword(null);
+//            // 设置30分钟有效期
+//            redisTemplate.opsForValue().set(key, loginUser, 30, TimeUnit.MINUTES);
+//
+//            // 返回数据
+//            Map<String, Object> data = new HashMap<>();
+//            data.put("token", key);
+//            return data;
+//        }
+//        return null;
+//    }
 
     @Override
     public Map<String, Object> getUserInfo(String token) {

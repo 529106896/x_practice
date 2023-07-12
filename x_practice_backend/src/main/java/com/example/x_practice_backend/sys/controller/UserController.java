@@ -1,12 +1,17 @@
 package com.example.x_practice_backend.sys.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.x_practice_backend.commmon.Result;
 import com.example.x_practice_backend.sys.entity.User;
 import com.example.x_practice_backend.sys.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +29,9 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // 获取所有用户信息
     @GetMapping("/all")
@@ -66,11 +74,64 @@ public class UserController {
     }
 
     // 查询用户
-    @GetMapping
-    public Result<Map<String, Object>> searchUser(@RequestParam(value = "username", required = false) String username,
+    @GetMapping("/list")
+    /*
+        username: 用户名
+        phone: 电话号码
+        pageNo: 要查看第几页
+        pageSize: 一页显示多少个
+     */
+    public Result<Map<String, Object>> getUserList(@RequestParam(value = "username", required = false) String username,
                                                   @RequestParam(value = "phone", required = false) String phone,
                                                   @RequestParam(value = "pageNo") Long pageNo,
                                                   @RequestParam(value = "pageSize") Long pageSize) {
-        return null;
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        // 当用户传入的username不为空时，将条件拼接，下同
+        wrapper.eq(StringUtils.hasLength(username), User::getUsername, username);
+        wrapper.eq(StringUtils.hasLength(phone), User::getPhone, phone);
+        wrapper.orderByDesc(User::getId);
+        // 分页，记得在配置文件中引入分页拦截器
+        Page<User> page = new Page<>(pageNo, pageSize);
+        userService.page(page, wrapper);
+
+        Map<String, Object> data = new HashMap<>();
+        // 总共有多少条
+        data.put("total", page.getTotal());
+        // 查询结果
+        data.put("rows", page.getRecords());
+
+        return Result.success(data);
+    }
+
+    // 新增用户
+    @PostMapping
+    public Result<?> addUser(@RequestBody User user) {
+        // 用户密码加密
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userService.save(user);
+        return Result.success("新增用户成功");
+    }
+
+    // 修改用户
+    @PutMapping
+    public Result<?> updateUser(@RequestBody User user) {
+        user.setPassword(null);
+        userService.updateById(user);
+        return Result.success("修改用户成功");
+    }
+
+    // 根据用户ID查询用户信息
+    @GetMapping("/{id}")
+    public Result<User> getUserById(@PathVariable("id") Integer id) {
+        User user = userService.getById(id);
+        return Result.success(user);
+    }
+
+    // 删除用户
+    @DeleteMapping("/{id}")
+    @GetMapping("/{id}")
+    public Result<?> deleteUserById(@PathVariable("id") Integer id) {
+        userService.removeById(id);
+        return Result.success("删除用户成功");
     }
 }
