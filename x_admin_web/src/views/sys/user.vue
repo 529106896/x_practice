@@ -36,7 +36,7 @@
     <!-- 结果列表 -->
     <el-card>
       <el-table :data="userList" stripe style="width: 100%">
-        <el-table-column label="#" width="180">
+        <el-table-column label="#" width="140">
           <template slot-scope="scope">
             {{
               (searchModel.pageNo - 1) * searchModel.pageSize + scope.$index + 1
@@ -44,22 +44,24 @@
           </template>
           <!-- (pageNo - 1) * pageSize + index + 1 -->
         </el-table-column>
-        <el-table-column prop="id" label="用户名ID" width="180">
+        <el-table-column prop="id" label="用户名ID" width="140">
         </el-table-column>
-        <el-table-column prop="username" label="用户名" width="180">
+        <el-table-column prop="username" label="用户名" width="140">
         </el-table-column>
         <el-table-column
           prop="phone"
           label="电话"
-          width="180"
+          width="140"
         ></el-table-column>
-        <el-table-column prop="status" label="用户状态">
+        <el-table-column prop="status" label="用户状态" width="140">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status == 1">正常</el-tag>
             <el-tag v-else type="danger">禁用</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="email" label="邮箱"></el-table-column>
+        <el-table-column prop="createTime" label="创建时间"></el-table-column>
+        <el-table-column prop="updateTime" label="修改时间"></el-table-column>
         <el-table-column label="操作" width="180">
           <template slot-scope="scope">
             <el-button
