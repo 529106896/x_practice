@@ -6,6 +6,7 @@ import com.example.x_practice_backend.sys.entity.User;
 import com.example.x_practice_backend.sys.mapper.UserMapper;
 import com.example.x_practice_backend.sys.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.x_practice_backend.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +35,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // 使用Jwt代替传统token
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @Override
     public Map<String, Object> login(User user) {
         // 先根据用户名进行查询
@@ -44,16 +49,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         // 结果不为空，并且传入的密码和数据库中的密码是匹配的，则生成token，并且将用户信息放入redis
         if (loginUser != null && passwordEncoder.matches(user.getPassword(), loginUser.getPassword())) {
             // 暂时使用UUID来生成token，终极方案应该是jwt
-            String key = "user:" + UUID.randomUUID();
+//            String key = "user:" + UUID.randomUUID();
 
             // 存入redis
             loginUser.setPassword(null);
             // 设置30分钟有效期
-            redisTemplate.opsForValue().set(key, loginUser, 30, TimeUnit.MINUTES);
+//            redisTemplate.opsForValue().set(key, loginUser, 30, TimeUnit.MINUTES);
+
+            // 使用jwt来代替UUID的token
+            String token = jwtUtil.createToken(loginUser);
 
             // 返回数据
             Map<String, Object> data = new HashMap<>();
-            data.put("token", key);
+            data.put("token", token);
             return data;
         }
         return null;
@@ -89,11 +97,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public Map<String, Object> getUserInfo(String token) {
         // 根据token从redis中获取用户信息
-        Object obj = redisTemplate.opsForValue().get(token);
+//        Object obj = redisTemplate.opsForValue().get(token);
+
+        // 因为jwt不再存在redis中，所以不需要从redis中获取token，直接解析jwt即可
+        User loginUser = null;
+        // 和原本的逻辑不同，如果解析出错，会抛异常，所以加上try-catch
+        try {
+            loginUser = jwtUtil.parseToken(token, User.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         // 如果拿到了对应信息
-        if (obj != null) {
-            // 先把Object序列化为Json字符串，再把Json字符串序列化为User对象
-            User loginUser = JSON.parseObject(JSON.toJSONString(obj), User.class);
+        if (loginUser != null) {
             // 把用户信息放到map中返回
             Map<String, Object> data = new HashMap<>();
             data.put("name", loginUser.getUsername());
@@ -109,6 +124,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public void logout(String token) {
-        redisTemplate.delete(token);
+        // 因为不再使用redis，所以不需要从redis删除token了
+//        redisTemplate.delete(token);
+
     }
 }

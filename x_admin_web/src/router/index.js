@@ -52,8 +52,8 @@ export const constantRoutes = [
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
       // 添加affix，设置首页选项卡无法关闭
-      // meta: { title: '首页', icon: 'dashboard', affix: true }
-      meta: { title: '首页', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard', affix: true }
+    //   meta: { title: '首页', icon: 'dashboard' }
     }]
   },
 
