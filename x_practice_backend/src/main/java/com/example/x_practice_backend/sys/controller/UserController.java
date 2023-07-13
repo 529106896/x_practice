@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.x_practice_backend.commmon.Result;
 import com.example.x_practice_backend.sys.entity.User;
 import com.example.x_practice_backend.sys.service.IUserService;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
@@ -22,6 +23,7 @@ import java.util.Map;
  * @author yjz
  * @since 2023-07-08
  */
+@Api(tags = {"用户模块控制器"}) // 对整个控制器的说明
 @RestController
 @RequestMapping("/user")
 //@CrossOrigin  可以使用这种方式来跨域，但不推荐
@@ -40,6 +42,10 @@ public class UserController {
 
     // 用户登录，登录成功返回用户token
     @PostMapping("/login")
+    @ApiOperation("用户登录接口")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "body", dataType = "com.example.x_practice_backend.sys.entity.User", name = "user", value = "包含用户名和密码的User对象", required = true),
+    })
     public Result<Map<String, Object>> login(@RequestBody User user) {
         Map<String, Object> data = userService.login(user);
 
@@ -128,7 +134,6 @@ public class UserController {
 
     // 删除用户
     @DeleteMapping("/{id}")
-    @GetMapping("/{id}")
     public Result<?> deleteUserById(@PathVariable("id") Integer id) {
         userService.removeById(id);
         return Result.success("删除用户成功");

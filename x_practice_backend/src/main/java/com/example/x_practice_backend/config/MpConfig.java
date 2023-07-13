@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// Mybatis-plus的配置文件
+// Mybatis-plus的配置类
 @Configuration
 public class MpConfig {
     @Bean

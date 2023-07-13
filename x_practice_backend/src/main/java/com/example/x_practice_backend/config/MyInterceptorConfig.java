@@ -23,7 +23,12 @@ public class MyInterceptorConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/user/login",
                         "/user/info",
-                        "/user/logout"
+                        "/user/logout",
+                        // 让拦截器放行Swagger访问
+                        "/error",
+                        "/swagger-ui/**",
+                        "/swagger-resources/**",
+                        "/v3/**"
                 );
     }
 }
