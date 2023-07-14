@@ -28,12 +28,6 @@ public class RoleController {
     @Autowired
     private IRoleService roleService;
 
-    // 获取所有角色信息
-    @GetMapping("/all")
-    public Result<List<Role>> getAllRole() {
-        return Result.success(roleService.list(), "查询成功");
-    }
-
     // 查询角色
     @GetMapping("/list")
     public Result<Map<String, Object>> getRoleList(@RequestParam(value = "roleName", required = false) String roleName,
@@ -56,29 +50,33 @@ public class RoleController {
     // 新增角色
     @PostMapping
     public Result<?> addRole(@RequestBody Role role) {
-        roleService.save(role);
+        roleService.addRole(role);
         return Result.success("新增角色成功");
     }
 
     // 修改角色
     @PutMapping
     public Result<?> updateRole(@RequestBody Role role) {
-        roleService.updateById(role);
+        roleService.updateRole(role);
         return Result.success("修改角色成功");
     }
 
     // 根据角色ID查询角色信息
     @GetMapping("/{id}")
     public Result<Role> getRoleById(@PathVariable("id") Integer id) {
-        Role role = roleService.getById(id);
+        Role role = roleService.getRoleById(id);
         return Result.success(role);
     }
 
     @DeleteMapping("/{id}")
     public Result<?> deleteRoleById(@PathVariable("id") Integer id) {
-        roleService.removeById(id);
+        roleService.deleteRoleById(id);
         return Result.success("删除角色成功");
     }
 
-
+    @GetMapping("/all")
+    public Result<List<Role>> getAllRole() {
+        List<Role> roleList = roleService.list();
+        return Result.success(roleList);
+    }
 }

@@ -133,6 +133,16 @@
           >
           </el-switch>
         </el-form-item>
+        <el-form-item label="用户角色" :label-width="formLabelWidth">
+          <el-checkbox-group v-model="userForm.roleIdList" style="width: 85%" :max="2">
+            <el-checkbox
+              v-for="role in roleList"
+              :label="role.roleId"
+              :key="role.roleId"
+              >{{ role.roleDesc }}</el-checkbox
+            >
+          </el-checkbox-group>
+        </el-form-item>
         <el-form-item
           label="电子邮件"
           prop="email"
@@ -151,6 +161,7 @@
 
 <script>
 import userApi from "@/api/userManage";
+import roleApi from "@/api/roleManage";
 
 export default {
   data() {
@@ -163,8 +174,11 @@ export default {
     //   callback();
     // };
     return {
+      roleList: [],
       formLabelWidth: "130px",
-      userForm: {},
+      userForm: {
+        roleIdList: [],
+      },
       dialogFormVisible: false,
       title: "",
       total: 0,
@@ -217,6 +231,12 @@ export default {
     };
   },
   methods: {
+    getAllRoleList() {
+      roleApi.getAllRoleList().then((response) => {
+        this.roleList = response.data;
+        console.log(this.roleList);
+      });
+    },
     deleteUser(user) {
       this.$confirm(`您确认删除用户 ${user.username} ？`, "提示", {
         confirmButtonText: "确定",
@@ -227,7 +247,7 @@ export default {
           userApi.deleteUserById(user.id).then((response) => {
             this.$message({
               type: "success",
-              message: response.message
+              message: response.message,
             });
             this.getUserList();
           });
@@ -268,7 +288,9 @@ export default {
     },
     clearForm() {
       // 关闭表单时清除输入框内容
-      this.userForm = {};
+      this.userForm = {
+        roleIdList: []
+      };
       // 关闭表单时清除验证消息
       this.$refs.userFormRef.clearValidate();
     },
@@ -301,6 +323,7 @@ export default {
   },
   created() {
     this.getUserList();
+    this.getAllRoleList();
   },
 };
 </script>

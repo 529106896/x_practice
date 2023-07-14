@@ -100,6 +100,21 @@
         >
           <el-input v-model="roleForm.roleDesc" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item
+          label="权限设置"
+          prop="menuIdList"
+          :label-width="formLabelWidth"
+        >
+          <el-tree
+            :data="menuList"
+            :props="menuProps"
+            ref="menuRef"
+            show-checkbox
+            style="width: 85%"
+            default-expand-all
+            node-key="menuId"
+          ></el-tree>
+        </el-form-item>
       </el-form>
 
       <div slot="footer" class="dialog-footer">
@@ -112,10 +127,17 @@
 
 <script>
 import roleApi from "@/api/roleManage";
+import menuApi from "@/api/menuManage";
 
 export default {
   data() {
     return {
+      menuList: [],
+      menuProps: {
+        children: "children",
+        // label的值来源于后端x_menu
+        label: "title",
+      },
       formLabelWidth: "130px",
       roleForm: {},
       dialogFormVisible: false,
@@ -157,6 +179,11 @@ export default {
     };
   },
   methods: {
+    getAllMenu() {
+      menuApi.getAllMenu().then((response) => {
+        this.menuList = response.data;
+      });
+    },
     deleteRole(role) {
       this.$confirm(`您确认删除角色 ${role.roleName} ？`, "提示", {
         confirmButtonText: "确定",
@@ -184,6 +211,11 @@ export default {
       this.$refs.roleFormRef.validate((valid) => {
         // 如果验证通过
         if (valid) {
+          let checkedKeys = this.$refs.menuRef.getCheckedKeys();
+          let halfCheckedKeys = this.$refs.menuRef.getHalfCheckedKeys();
+          this.roleForm.menuIdList = checkedKeys.concat(halfCheckedKeys);
+        //   console.log(this.roleForm.menuIdList);
+        //   return;
           //   console.log(this.roleForm.roleName);
           //   console.log(this.roleForm.roleDesc);
           // 防止switch组件默认值是undefined
@@ -213,6 +245,8 @@ export default {
       this.roleForm = {};
       // 关闭表单时清除验证消息
       this.$refs.roleFormRef.clearValidate();
+      // 关闭表单时清除选择项
+      this.$refs.menuRef.setCheckedKeys([]);
     },
     openEditUI(id) {
       if (id == null) {
@@ -222,6 +256,7 @@ export default {
         // 根据id查询角色数据
         roleApi.getRoleById(id).then((response) => {
           this.roleForm = response.data;
+          this.$refs.menuRef.setCheckedKeys(response.data.menuIdList);
         });
       }
       this.dialogFormVisible = true;
@@ -243,6 +278,7 @@ export default {
   },
   created() {
     this.getRoleList();
+    this.getAllMenu();
   },
 };
 </script>

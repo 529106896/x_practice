@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>
@@ -71,4 +72,7 @@ public class User implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty(value = "记录修改时间")
     private LocalDateTime updateTime;
+
+    @TableField(exist = false)
+    private List<Integer> roleIdList;
 }

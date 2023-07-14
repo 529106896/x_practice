@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -39,4 +40,8 @@ public class Role implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime updateTime;
+
+    // 用于接收从前端传过来的角色对应菜单id
+    @TableField(exist = false)
+    private List<Integer> menuIdList;
 }

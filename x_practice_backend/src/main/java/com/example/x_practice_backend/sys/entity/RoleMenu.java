@@ -1,9 +1,13 @@
 package com.example.x_practice_backend.sys.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -14,6 +18,9 @@ import java.io.Serializable;
  * @since 2023-07-08
  */
 @TableName("x_role_menu")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RoleMenu implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -25,34 +32,21 @@ public class RoleMenu implements Serializable {
 
     private Integer menuId;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
+    public RoleMenu(Integer id, Integer roleId, Integer menuId) {
         this.id = id;
-    }
-    public Integer getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Integer roleId) {
         this.roleId = roleId;
-    }
-    public Integer getMenuId() {
-        return menuId;
-    }
-
-    public void setMenuId(Integer menuId) {
         this.menuId = menuId;
     }
 
-    @Override
-    public String toString() {
-        return "RoleMenu{" +
-            "id=" + id +
-            ", roleId=" + roleId +
-            ", menuId=" + menuId +
-        "}";
-    }
+    //    public RoleMenu(Integer id, Integer roleId, Integer menuId) {
+//        return new
+//    }
+
+    @TableField(fill = FieldFill.INSERT)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private LocalDateTime updateTime;
 }

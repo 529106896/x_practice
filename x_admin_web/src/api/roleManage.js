@@ -44,4 +44,10 @@ export default {
             method: 'delete'
         });
     },
+    getAllRoleList() {
+        return request({
+            url: '/role/all',
+            method: 'get',
+        });
+    },
 }
