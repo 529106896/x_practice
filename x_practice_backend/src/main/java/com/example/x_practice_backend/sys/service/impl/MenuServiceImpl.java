@@ -31,6 +31,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
         return menuList;
     }
 
+
     private void setSubMenu(List<Menu> menuList) {
         if (menuList != null) {
             // 遍历一级菜单
@@ -42,6 +43,28 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
                 menu.setChildren(subMenuList);
                 // 递归调用，继续查询子菜单
                 setSubMenu(subMenuList);
+            }
+        }
+    }
+
+    // 根据用户id来看用户能查看哪些菜单
+    @Override
+    public List<Menu> getMenuListByUserId(Integer userId) {
+        // 先查用户能看的一级菜单
+        List<Menu> menuList = this.baseMapper.getMenuListByUserId(userId, 0);
+
+        // 把一级菜单填上
+        setSubMenuByUserId(userId, menuList);
+        return menuList;
+    }
+
+    private void setSubMenuByUserId(Integer userId, List<Menu> menuList) {
+        if (menuList != null) {
+            for (Menu menu : menuList) {
+                List<Menu> subMenuList = this.baseMapper.getMenuListByUserId(userId, menu.getMenuId());
+                menu.setChildren(subMenuList);
+                // 递归调用
+                setSubMenuByUserId(userId, subMenuList);
             }
         }
     }

@@ -56,61 +56,6 @@ export const constantRoutes = [
     //   meta: { title: '首页', icon: 'dashboard' }
     }]
   },
-
-  {
-    path: '/sys',
-    component: Layout,
-    redirect: '/sys/user',
-    name: 'sysManage',
-    // icon可以替换图标
-    meta: { title: '系统管理', icon: 'electro' },
-    children: [
-      {
-        path: 'user',
-        name: 'user',
-        // component表示对应哪个组件，路径必须存在
-        component: () => import('@/views/sys/user'),
-        meta: { title: '用户管理', icon: 'user' }
-      },
-      {
-        path: 'role',
-        name: 'role',
-        component: () => import('@/views/sys/role'),
-        meta: { title: '角色管理', icon: 'eye-open' }
-      }
-    ]
-  },
-
-  {
-    path: '/test',
-    component: Layout,
-    redirect: '/test/test1',
-    name: 'test',
-    meta: { title: '功能测试', icon: 'form' },
-    children: [
-      {
-        path: 'test1',
-        name: 'test1',
-        component: () => import('@/views/test/test1'),
-        meta: { title: '功能点一测试', icon: 'form' }
-      },
-      {
-        path: 'test2',
-        name: 'test2',
-        component: () => import('@/views/test/test2'),
-        meta: { title: '功能点二测试', icon: 'form' }
-      },
-      {
-        path: 'test3',
-        name: 'test3',
-        component: () => import('@/views/test/test3'),
-        meta: { title: '功能点三测试', icon: 'form' }
-      }
-    ]
-  },
-
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({

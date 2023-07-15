@@ -2,10 +2,12 @@ package com.example.x_practice_backend.sys.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.example.x_practice_backend.sys.entity.Menu;
 import com.example.x_practice_backend.sys.entity.User;
 import com.example.x_practice_backend.sys.entity.UserRole;
 import com.example.x_practice_backend.sys.mapper.UserMapper;
 import com.example.x_practice_backend.sys.mapper.UserRoleMapper;
+import com.example.x_practice_backend.sys.service.IMenuService;
 import com.example.x_practice_backend.sys.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.x_practice_backend.util.JwtUtil;
@@ -46,6 +48,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Resource
     private UserRoleMapper userRoleMapper;
+
+    @Autowired
+    private IMenuService menuService;
 
     @Override
     public Map<String, Object> login(User user) {
@@ -121,9 +126,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             Map<String, Object> data = new HashMap<>();
             data.put("name", loginUser.getUsername());
             data.put("avatar", loginUser.getAvatar());
+
             // 根据用户id获取角色信息时需要做关联查询
             List<String> userRoleList = this.baseMapper.getRoleNameByUserId(loginUser.getId());
             data.put("roles", userRoleList);
+
+            // 根据用户的角色获取用户所拥有的权限，即看这个用户能查看哪些menu
+            List<Menu> menuList = menuService.getMenuListByUserId(loginUser.getId());
+            data.put("menuList", menuList);
 
             return data;
         }
