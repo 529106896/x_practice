@@ -8,8 +8,8 @@ spring:
     url: jdbc:mysql:///xdb
   redis:
     port: 6379
-    host: 175.178.16.189
-    password: 12345678
+    host: 
+    password: 
 
 logging:
   level:
